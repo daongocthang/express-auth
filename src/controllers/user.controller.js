@@ -4,7 +4,6 @@ const messenger = new Messenger();
 messenger.compose('{0} Content', 'content');
 
 const allAccess = (req, res) => {
-    res.status(200).send(str.f);
     messenger.from(res.status(200)).send('content', ['Public']);
 };
 const userBoard = (req, res) => {

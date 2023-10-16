@@ -1,5 +1,5 @@
 import Messenger from '../utils/messenger';
-import models from './models';
+import models from '../models';
 import { ROLES } from '../models';
 
 const User = models.User;
@@ -26,7 +26,7 @@ const checkDuplicateUsernameOrEmail = async (req, res, next) => {
 
     next();
 };
-const checkRolesExists = (req, res, next) => {
+const checkRolesExist = (req, res, next) => {
     const { roles } = req.body;
     if (roles) {
         for (let i = 0; i < roles.length; i++) {
@@ -41,7 +41,7 @@ const checkRolesExists = (req, res, next) => {
     next();
 };
 
-export default verifySignUp = {
+export default {
     checkDuplicateUsernameOrEmail,
-    checkRolesExists,
+    checkRolesExist,
 };

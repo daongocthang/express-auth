@@ -33,4 +33,4 @@ export async function createRolesIfNotExist() {
     }
 }
 
-export default { sequelize, user, role };
+export default { sequelize, User: user, Role: role };
