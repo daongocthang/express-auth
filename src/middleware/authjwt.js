@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { secret } from '../config/auth.config';
 import models from '../models';
 
-const { User, Role } = models;
+const { User } = models;
 
 const messenger = new Messenger();
 messenger.compose('Require {0} Role!', 'requireRole');
