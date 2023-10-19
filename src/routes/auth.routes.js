@@ -14,7 +14,8 @@ export default (app) => {
         controller.signup,
     );
 
-    router.post('/login', controller.login);
+    router.post('/signin', controller.signin);
+    router.post('/signout', controller.signout);
 
     app.use('/api/auth', router);
 };

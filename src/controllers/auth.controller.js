@@ -3,13 +3,15 @@ import models from '../models';
 import Messenger from '../utils/messenger';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { secret } from '../config/auth.config';
+import authConfig from '../config/auth.config';
 
 const { User, Role } = models;
+const { TOKEN_SECRET } = authConfig;
 
 const messenger = new Messenger();
 messenger.compose('User was registered successfully!', 'registered');
 messenger.compose('User Not found.', 'notFound');
+messenger.compose('You have beeb signed out!', 'signout');
 
 const signup = async (req, res) => {
     const { username, password, email, roles } = req.body;
@@ -38,7 +40,7 @@ const signup = async (req, res) => {
         res.status(500).send({ message: er.message });
     }
 };
-const login = async (req, res) => {
+const signin = async (req, res) => {
     const { username, password } = req.body;
     try {
         const user = await User.findOne({
@@ -56,12 +58,11 @@ const login = async (req, res) => {
         const passwordIsValid = bcrypt.compareSync(password, user.password);
         if (!passwordIsValid) {
             res.status(401).send({
-                accessToken: null,
                 message: 'Invalid Password',
             });
         }
 
-        const token = jwt.sign({ id: user.id }, secret, {
+        const token = jwt.sign({ id: user.id }, TOKEN_SECRET, {
             algorithm: 'HS256',
             allowInsecureKeySizes: true,
             expiresIn: 86400,
@@ -69,16 +70,26 @@ const login = async (req, res) => {
         const roleList = await user.getRoles({ raw: true });
         const authorities = roleList.map((role) => 'ROLE_' + role.name.toUpperCase());
 
+        req.session.token = token;
+        console.log(req.session);
+
         res.status(200).send({
             id: user.id,
             username: user.username,
             email: user.email,
             roles: authorities,
-            accessToken: token,
         });
     } catch (er) {
         res.status(500).send({ message: er.message });
     }
 };
+const signout = async (req, res, next) => {
+    try {
+        req.session = null;
+        messenger.from(res.status(200)).send('signout');
+    } catch (er) {
+        next(er);
+    }
+};
 
-export default { signup, login };
+export default { signup, signin, signout };
